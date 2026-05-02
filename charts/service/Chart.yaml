@@ -1,0 +1,16 @@
+apiVersion: v2
+name: service
+description: |
+  Generic service chart for NaaS teams.
+  Deploys a Deployment + Service with NaaS-compliant security defaults.
+  All Kyverno baseline policies pass out of the box.
+  Optional: HPA, PodDisruptionBudget, Ingress.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - naas
+  - service
+maintainers:
+  - name: platform-team
+    email: platform@naas.local

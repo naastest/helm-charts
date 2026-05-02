@@ -1,0 +1,102 @@
+# ── Required ────────────────────────────────────────────────────────────────
+# Full image reference including tag, e.g. "nginxinc/nginx-unprivileged:1.27.4"
+image: ""
+
+# Port the container listens on
+containerPort: 8080
+
+# ── Naming ───────────────────────────────────────────────────────────────────
+# Override all resource names (optional, defaults to Helm release name)
+fullnameOverride: ""
+
+# ── Replicas ─────────────────────────────────────────────────────────────────
+replicaCount: 1
+
+# ── Service ──────────────────────────────────────────────────────────────────
+service:
+  port: 80
+  # Defaults to containerPort if empty
+  targetPort: ""
+
+# ── Resources ────────────────────────────────────────────────────────────────
+# Required by Kyverno require-resource-limits policy.
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# ── Security context ─────────────────────────────────────────────────────────
+# These defaults satisfy the NaaS Kyverno baseline policies:
+#   no-root-containers           → runAsNonRoot: true
+#   disallow-privilege-escalation → allowPrivilegeEscalation: false
+# Do NOT override runAsNonRoot: false — pods will be rejected at admission.
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# ── Health probes ─────────────────────────────────────────────────────────────
+probes:
+  enabled: true
+  # Path that returns 2xx when the container is healthy
+  path: /
+  # Defaults to containerPort if empty
+  port: ""
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+  liveness:
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    failureThreshold: 3
+
+# ── Environment variables ─────────────────────────────────────────────────────
+# Plain key/value pairs injected as env vars
+env: {}
+  # MY_VAR: "value"
+
+# ConfigMap or Secret references
+envFrom: []
+  # - configMapRef:
+  #     name: my-config
+  # - secretRef:
+  #     name: my-secret
+
+# ── HPA ───────────────────────────────────────────────────────────────────────
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+# ── PodDisruptionBudget ───────────────────────────────────────────────────────
+pdb:
+  enabled: false
+  minAvailable: 1
+
+# ── Ingress ───────────────────────────────────────────────────────────────────
+ingress:
+  enabled: false
+  className: nginx
+  host: ""
+  path: /
+  pathType: Prefix
+  tls: false
+  tlsSecretName: ""
+
+# ── Pod metadata ─────────────────────────────────────────────────────────────
+podAnnotations: {}
+podLabels: {}
+
+# ── Scheduling ───────────────────────────────────────────────────────────────
+nodeSelector: {}
+tolerations: []
+affinity: {}

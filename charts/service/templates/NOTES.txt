@@ -1,0 +1,11 @@
+Service {{ include "service.fullname" . }} deployed to {{ .Release.Namespace }}.
+
+Image:    {{ .Values.image }}
+Replicas: {{ .Values.replicaCount }}{{ if .Values.hpa.enabled }} (HPA: {{ .Values.hpa.minReplicas }}-{{ .Values.hpa.maxReplicas }}){{ end }}
+Port:     {{ .Values.containerPort }} -> svc:{{ .Values.service.port }}
+{{- if .Values.ingress.enabled }}
+Ingress:  http{{ if .Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.host }}{{ .Values.ingress.path }}
+{{- end }}
+
+NaaS security defaults active:
+  runAsNonRoot: true  |  allowPrivilegeEscalation: false  |  capabilities.drop: [ALL]
